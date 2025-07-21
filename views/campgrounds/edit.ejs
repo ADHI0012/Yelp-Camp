@@ -1,0 +1,73 @@
+<% layout('layouts/boilerplate.ejs') %>
+
+<div class="row">
+  <div class="col-md-6 offset-3">
+    <h1>Edit Campground</h1>
+    <form
+      action="/campgrounds/<%= campground._id %>?_method=PUT"
+      method="POST"
+      class="needs-validation"
+      novalidate
+    >
+      <div class="mb-3">
+        <label class="form-label" for="name">Campground Name</label>
+        <input
+          class="form-control"
+          type="text"
+          id="name"
+          name="campground[name]"
+          value="<%= campground.name%>"
+          required
+        />
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="location">Location</label>
+        <input
+          class="form-control"
+          type="text"
+          name="campground[location]"
+          id="location"
+          value="<%= campground.location%>"
+          required
+        />
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="url">Image Url</label>
+        <input
+          class="form-control"
+          type="text"
+          name="campground[image]"
+          id="url"
+          value="<%= campground.image%>"
+          required
+        />
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="price">Price</label>
+        <input
+          class="form-control"
+          type="text"
+          name="campground[price]"
+          id="price"
+          value="<%= campground.price%>"
+        />
+      </div>
+      <div class="form-group mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea
+          class="form-control"
+          id="description"
+          rows="3"
+          name="campground[description]"
+          required
+        >
+<%= campground.description%></textarea
+        >
+      </div>
+      <div class="mb-3">
+        <button class="btn btn-info text-white">Edit Campground</button>
+      </div>
+    </form>
+    <a href="/campgrounds">All Campgrounds</a>
+  </div>
+</div>
