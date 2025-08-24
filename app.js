@@ -3,11 +3,12 @@ const mongoose = require("mongoose");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
-const Campground = require("./models/campground");
-const Review = require("./models/reviews");
-const { campgroundSchema, reviewSchema } = require("./schemas.js");
-const wrapAsync = require("./utils/wrapAsync");
 const ExpressError = require("./utils/ExpressError");
+const session = require("express-session");
+const flash = require("connect-flash");
+
+const campgrounds = require("./routes/campground.js");
+const reviews = require("./routes/reviews.js");
 mongoose
   .connect("mongodb://127.0.0.1:27017/yelp-camp")
   .then(() => {
@@ -19,17 +20,6 @@ mongoose
 
 const app = express();
 
-function validateCampground(req, res, next) {
-  const { error } = campgroundSchema.validate(req.body);
-
-  if (error) {
-    const msg = error.details.map((el) => el.message).join(",");
-    throw new ExpressError(msg, 400);
-  } else {
-    next();
-  }
-}
-
 function validateReview(req, res, next) {
   const { error } = reviewSchema.validate(req.body);
   if (error) {
@@ -40,90 +30,34 @@ function validateReview(req, res, next) {
   }
 }
 
+const sessionConfig = {
+  secret: "thisshouldbeabettersecret",
+  resave: false,
+  saveUninitalized: true,
+  cookie: {
+    httpOnly: true,
+    expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+  },
+};
+app.use(session(sessionConfig));
+app.use(flash());
+
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  next();
+});
+
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
+app.use("/campgrounds", campgrounds);
+app.use("/campgrounds/:id/reviews", reviews);
+app.use(express.static("public"));
 
-app.get("/campgrounds", async (req, res) => {
-  const campgrounds = await Campground.find({});
-  res.render("campgrounds/index", { campgrounds });
-});
-
-app.post(
-  "/campgrounds",
-  validateCampground,
-  wrapAsync(async (req, res) => {
-    // if (!req.body.campground) throw new ExpressError("Invalid Campground", 400);
-
-    const newCampground = await new Campground(req.body.campground);
-    await newCampground.save();
-    res.redirect(`/campgrounds/${newCampground._id}`);
-  })
-);
-
-app.get("/campgrounds/new", (req, res) => {
-  res.render("campgrounds/new");
-});
-
-app.get(
-  "/campgrounds/:id",
-  wrapAsync(async (req, res) => {
-    const reqCampground = await Campground.findById(req.params.id).populate(
-      "reviews"
-    );
-    res.render("campgrounds/show", { campground: reqCampground });
-  })
-);
-
-app.get(
-  "/campgrounds/:id/edit",
-  wrapAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id);
-    res.render("campgrounds/edit", { campground });
-  })
-);
-
-app.put(
-  "/campgrounds/:id",
-  validateCampground,
-  wrapAsync(async (req, res) => {
-    const { id } = req.params;
-    await Campground.findByIdAndUpdate(id, req.body.campground);
-    res.redirect(`/campgrounds/${id}`);
-  })
-);
-
-app.delete(
-  "/campgrounds/:id",
-  wrapAsync(async (req, res) => {
-    const { id } = req.params;
-    await Campground.findByIdAndDelete(id);
-    res.redirect("/campgrounds");
-  })
-);
-
-app.post(
-  "/campgrounds/:id/reviews",
-  validateReview,
-  wrapAsync(async (req, res) => {
-    // console.log(req.body);
-    const campground = await Campground.findById(req.params.id);
-
-    const review = new Review(req.body.review);
-    campground.reviews.push(review);
-    await review.save();
-    await campground.save();
-    res.redirect(`/campgrounds/${req.params.id}`);
-  })
-);
-app.delete("/campgrounds/:id/reviews/:reviewId", async (req, res, next) => {
-  const { id, reviewId } = req.params;
-  await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
-  await Review.findByIdAndDelete(reviewId);
-  res.redirect(`/campgrounds/${id}`);
-});
 app.get("/favicon.ico", (req, res) => res.status(204).end());
 
 app.all(/(.*)/, (req, res, next) => {
