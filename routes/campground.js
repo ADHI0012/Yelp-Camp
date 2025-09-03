@@ -4,6 +4,7 @@ const wrapAsync = require("../utils/wrapAsync");
 const { campgroundSchema } = require("../schemas.js");
 const Campground = require("../models/campground");
 const ExpressError = require("../utils/ExpressError");
+const { isLoggedIn } = require("../middleware.js");
 
 function validateCampground(req, res, next) {
   const { error } = campgroundSchema.validate(req.body);
@@ -24,6 +25,7 @@ router.get("/", async (req, res) => {
 
 router.post(
   "/",
+  isLoggedIn,
   validateCampground,
   wrapAsync(async (req, res) => {
     // if (!req.body.campground) throw new ExpressError("Invalid Campground", 400);
@@ -35,7 +37,7 @@ router.post(
   })
 );
 
-router.get("/new", (req, res) => {
+router.get("/new", isLoggedIn, (req, res) => {
   res.render("campgrounds/new");
 });
 
@@ -55,6 +57,7 @@ router.get(
 
 router.get(
   "/:id/edit",
+  isLoggedIn,
   wrapAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id);
     if (!campground) {
