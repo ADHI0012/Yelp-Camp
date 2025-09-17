@@ -21,6 +21,7 @@ async function seedData() {
   await Campground.deleteMany({});
   for (let i = 0; i < 50; i++) {
     const camp = new Campground({
+      author: "68b8420ad09fe39a0f6ee39c",
       location: `${cities[getRand()].city}, ${cities[getRand()].state}`,
       name: `${getRandElement(descriptors)} ${getRandElement(places)}`,
       image: `https://picsum.photos/400?random=${getRand()}`,
