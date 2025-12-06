@@ -60,6 +60,7 @@ app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
   res.locals.currentUser = req.user;
+  console.log(res.locals.currentUser);
   next();
 });
 
@@ -75,11 +76,11 @@ app.use(express.static("public"));
 
 app.get("/favicon.ico", (req, res) => res.status(204).end());
 
-app.get("/fakeUser", async (req, res) => {
-  const user = await new User({ email: "adhi@gmail.com", username: "Adhi" });
-  const newUser = await User.register(user, "adhi199");
-  res.send(newUser);
-});
+// app.get("/fakeUser", async (req, res) => {
+//   const user = await new User({ email: "adhi@gmail.com", username: "Adhi" });
+//   const newUser = await User.register(user, "adhi199");
+//   res.send(newUser);
+// });
 
 app.all(/(.*)/, (req, res, next) => {
   next(new ExpressError("Page not found", 404));
