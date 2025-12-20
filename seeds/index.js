@@ -24,7 +24,17 @@ async function seedData() {
       author: "68b8420ad09fe39a0f6ee39c",
       location: `${cities[getRand()].city}, ${cities[getRand()].state}`,
       name: `${getRandElement(descriptors)} ${getRandElement(places)}`,
-      image: `https://picsum.photos/400?random=${getRand()}`,
+      images: [
+        {
+          url: "https://res.cloudinary.com/djidgtahl/image/upload/v1765262291/YelpCamp/jvdybgroyrxjudwhljal.jpg",
+          filename: "YelpCamp/jvdybgroyrxjudwhljal",
+        },
+        {
+          url: "https://res.cloudinary.com/djidgtahl/image/upload/v1765262293/YelpCamp/fnplwrk4gn1z9mvydfkr.jpg",
+          filename: "YelpCamp/fnplwrk4gn1z9mvydfkr",
+        },
+      ],
+
       price: Math.random() * 20,
       description:
         "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Adipisci dignissimos in voluptas soluta eum veritatis. Sit doloribus possimus dolorem facere aliquam enim nesciunt ducimus id minima, alias eaque, cum velit?",

@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
@@ -36,6 +40,7 @@ passport.deserializeUser(User.deserializeUser());
 const campgroundRoutes = require("./routes/campground.js");
 const reviewRoutes = require("./routes/reviews.js");
 const userRoutes = require("./routes/user.js");
+const { UploadStream } = require("cloudinary");
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/yelp-camp")
@@ -60,7 +65,6 @@ app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
   res.locals.currentUser = req.user;
-  console.log(res.locals.currentUser);
   next();
 });
 
@@ -76,18 +80,11 @@ app.use(express.static("public"));
 
 app.get("/favicon.ico", (req, res) => res.status(204).end());
 
-// app.get("/fakeUser", async (req, res) => {
-//   const user = await new User({ email: "adhi@gmail.com", username: "Adhi" });
-//   const newUser = await User.register(user, "adhi199");
-//   res.send(newUser);
-// });
-
 app.all(/(.*)/, (req, res, next) => {
   next(new ExpressError("Page not found", 404));
 });
 
 app.use((err, req, res, next) => {
-  // console.log(err);
   const { statusCode = 500 } = err;
   if (!err.message) err.message = "Oh No, Something Went Wrong";
   res.status(statusCode).render("error", { err });

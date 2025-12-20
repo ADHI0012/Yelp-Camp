@@ -10,12 +10,17 @@ const {
   validateCampground,
   isAuthor,
 } = require("../middleware.js");
+const multer = require("multer");
+const { storage } = require("../cloudinary-config");
+const upload = multer({ storage });
 
 router
   .route("/")
   .get(campgrounds.show)
+
   .post(
     isLoggedIn,
+    upload.array("image"),
     validateCampground,
     wrapAsync(campgrounds.createCampground)
   );
@@ -25,7 +30,14 @@ router.get("/new", isLoggedIn, campgrounds.renderNewForm);
 router
   .route("/:id")
   .get(wrapAsync(campgrounds.showCampground))
-  .put(validateCampground, isAuthor, wrapAsync(campgrounds.updateCampground));
+  .put(
+    isLoggedIn,
+    upload.array("image"),
+    validateCampground,
+    isAuthor,
+    wrapAsync(campgrounds.updateCampground)
+  )
+  .delete(isLoggedIn, isAuthor, wrapAsync(campgrounds.deleteCampground));
 
 router.get(
   "/:id/edit",
@@ -33,7 +45,5 @@ router.get(
   isAuthor,
   wrapAsync(campgrounds.editCampground)
 );
-
-router.delete("/:id", isAuthor, wrapAsync(campgrounds.deleteCampground));
 
 module.exports = router;

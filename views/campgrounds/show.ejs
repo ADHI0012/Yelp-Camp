@@ -3,13 +3,48 @@
 
 <div class="row">
   <div class="col-md-6">
-    <div class="card mb-3">
-      <img
-        src="<%= campground.image %>"
-        class="card-img-top"
-        alt="Campground Image"
-        style="max-width: 600px; max-height: 400px"
-      />
+    <div
+      id="carouselExampleControls"
+      class="carousel slide"
+      data-bs-ride="carousel"
+    >
+      <div class="carousel-inner">
+        <% campground.images.forEach((img, i) => { %>
+        <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
+          <img
+            class="d-block w-100"
+            src="<%= img.url %>"
+            style="max-height: 500px"
+            alt="Slide <%= i + 1 %>"
+          />
+        </div>
+        <% }) %>
+      </div>
+
+      <% if (campground.images.length > 1) { %>
+      <button
+        class="carousel-control-prev"
+        type="button"
+        data-bs-target="#carouselExampleControls"
+        data-bs-slide="prev"
+      >
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+
+      <button
+        class="carousel-control-next"
+        type="button"
+        data-bs-target="#carouselExampleControls"
+        data-bs-slide="next"
+      >
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+    <% } %>
+
+    <div class="card mb-3 mt-3">
       <div class="card-body">
         <h5 class="card-title"><%= campground.name %></h5>
         <p class="card-text"><%= campground.description %></p>
@@ -43,6 +78,7 @@
     </div>
   </div>
 
+  <!-- Right column: reviews -->
   <% if (currentUser) { %>
   <div class="col-md-6">
     <h2>Leave a review</h2>
@@ -100,6 +136,7 @@
           <label for="first-rate5" title="Amazing">5 stars</label>
         </fieldset>
       </div>
+
       <div class="form-group mb-3">
         <label for="body" class="form-label">Review</label>
         <textarea
@@ -119,9 +156,7 @@
       <div class="card-body">
         <h5 class="card-title"><%= review.author.username %></h5>
         <p class="starability-result" data-rating="<%= review.rating %>"></p>
-
         <p class="card-text"><%= review.body %></p>
-
         <form
           action="/campgrounds/<%= campground._id %>/reviews/<%= review._id %>?_method=DELETE"
           method="POST"
