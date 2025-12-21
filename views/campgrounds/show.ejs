@@ -20,7 +20,6 @@
         </div>
         <% }) %>
       </div>
-
       <% if (campground.images.length > 1) { %>
       <button
         class="carousel-control-prev"
@@ -66,6 +65,7 @@
           class="card-link btn btn-info"
           >Edit</a
         >
+
         <form
           class="d-inline"
           action="/campgrounds/<%= campground._id %>?_method=DELETE"
@@ -76,10 +76,11 @@
       </div>
       <% } %>
     </div>
+    <div id="map" style="width: 400px; height: 300px"></div>
   </div>
 
-  <!-- Right column: reviews -->
   <% if (currentUser) { %>
+
   <div class="col-md-6">
     <h2>Leave a review</h2>
     <form
@@ -169,3 +170,10 @@
   </div>
   <% } %>
 </div>
+
+<script>
+  const mapToken = "<%= process.env.MAPBOX_TOKEN %>";
+  const campground = <%- JSON.stringify(campground) %>;
+</script>
+
+<script src="/js/showMap.js"></script>
