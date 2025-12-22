@@ -19,12 +19,16 @@ const getRandElement = (array) =>
 
 async function seedData() {
   await Campground.deleteMany({});
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 350; i++) {
+    let rand = getRand();
     const camp = new Campground({
       author: "68b8420ad09fe39a0f6ee39c",
-      location: `${cities[getRand()].city}, ${cities[getRand()].state}`,
+      location: `${cities[rand].city}, ${cities[rand].state}`,
       name: `${getRandElement(descriptors)} ${getRandElement(places)}`,
-      geometry: { type: "Point", coordinates: [-122.330286, 47.603243] },
+      geometry: {
+        type: "Point",
+        coordinates: [cities[rand].longitude, cities[rand].latitude],
+      },
       images: [
         {
           url: "https://res.cloudinary.com/djidgtahl/image/upload/v1765262291/YelpCamp/jvdybgroyrxjudwhljal.jpg",
