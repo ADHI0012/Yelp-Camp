@@ -14,14 +14,27 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
 const helmet = require("helmet");
+const MongoDBStore = require("connect-mongo")(session);
 
 const app = express();
+const dbUrl = "mongodb://127.0.0.1:27017/yelp-camp";
 
 const mongoSanitize = require("express-mongo-sanitize");
 
+const store = new MongoDBStore({
+  url: dbUrl,
+  secret: process.env.SESSION_SECRET,
+  touchAfter: 24 * 3600,
+});
+
+store.on("error", function (e) {
+  console.log("SESSION STORE ERROR", e);
+});
+
 const sessionConfig = {
+  store,
   name: "session",
-  secret: "thisshouldbeabettersecret",
+  secret: process.env.SESSION_SECRET,
   secure: true,
   resave: false,
   saveUninitialized: true,
@@ -94,7 +107,7 @@ const userRoutes = require("./routes/user.js");
 const { UploadStream } = require("cloudinary");
 
 mongoose
-  .connect("mongodb://127.0.0.1:27017/yelp-camp")
+  .connect(dbUrl)
   .then(() => {
     console.log("MONGO CONNECTION SUCCESSFULL");
   })
