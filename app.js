@@ -17,7 +17,7 @@ const helmet = require("helmet");
 const MongoDBStore = require("connect-mongo")(session);
 
 const app = express();
-const dbUrl = "mongodb://127.0.0.1:27017/yelp-camp";
+const dbUrl = process.env.DB_URL || "mongodb://127.0.0.1:27017/yelp-camp";
 
 const mongoSanitize = require("express-mongo-sanitize");
 
@@ -159,6 +159,7 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("error", { err });
 });
 
-app.listen(3000, () => {
-  console.log("LISTENING ON PORT 3000");
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Serving on port ${port}`);
 });
